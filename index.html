@@ -112,6 +112,10 @@
             })
             .catch(error => console.error("Error fetching humidity:", error));
 
+        // Verwijder het fetch-verzoek voor UV index
+        // Als je UV index niet nodig hebt, kun je deze sectie gewoon verwijderen
+        // Hier is het voor het geval je het later wilt toevoegen
+        /*
         fetch(`https://api.thingspeak.com/channels/${channelId}/fields/3/last.json?api_key=${readApiKey}`)
             .then(response => {
                 if (!response.ok) {
@@ -121,9 +125,10 @@
             })
             .then(data => {
                 console.log("UV Index Data:", data); // Debug log
-                document.getElementById("uvValue").textContent = data.field3; // UV Index
+                document.getElementById("uvValue").textContent = data.field3 || "N/A"; // UV Index
             })
             .catch(error => console.error("Error fetching UV index:", error));
+        */
     }
 
     // Fetch data every 5 seconds
@@ -138,6 +143,7 @@
         alert("Device control functionality not implemented yet.");
     });
 });
+
 
     </script>
 </body>
