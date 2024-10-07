@@ -79,16 +79,32 @@
     <!-- JavaScript -->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            // Simulate fetching data from ESP32
+            // ThingSpeak API configuratie
+            const channelId = "2648650"; // Vervang door je kanaal ID
+            const readApiKey = "8KPBKJBRJMPH3WNR"; // Vervang door je lees API sleutel
+            
+            // Functie om gegevens van ThingSpeak op te halen
             function getSensorData() {
-                fetch("http://your-esp32-ip/sensor-data")
+                fetch(`http://api.thingspeak.com/channels/${channelId}/fields/1/last.json?api_key=${readApiKey}`)
                     .then(response => response.json())
                     .then(data => {
-                        document.getElementById("tempValue").textContent = data.temperature;
-                        document.getElementById("humidityValue").textContent = data.humidity;
-                        document.getElementById("uvValue").textContent = data.uvIndex;
+                        document.getElementById("tempValue").textContent = data.field1; // Temperatuur
                     })
-                    .catch(error => console.log("Error fetching sensor data:", error));
+                    .catch(error => console.log("Error fetching temperature:", error));
+                
+                fetch(`http://api.thingspeak.com/channels/${channelId}/fields/2/last.json?api_key=${readApiKey}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById("humidityValue").textContent = data.field2; // Vochtigheid
+                    })
+                    .catch(error => console.log("Error fetching humidity:", error));
+
+                fetch(`http://api.thingspeak.com/channels/${channelId}/fields/3/last.json?api_key=${readApiKey}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById("uvValue").textContent = data.field3; // UV Index
+                    })
+                    .catch(error => console.log("Error fetching UV index:", error));
             }
 
             // Fetch data every 5 seconds
@@ -96,17 +112,10 @@
 
             // Control button event
             document.getElementById("controlButton").addEventListener("click", function() {
-                fetch("http://your-esp32-ip/toggle-device", {
-                    method: "POST"
-                })
-                .then(response => response.json())
-                .then(data => {
-                    alert(data.message);
-                })
-                .catch(error => console.log("Error controlling device:", error));
+                // Voeg hier de functionaliteit toe voor het aan/uit zetten van een apparaat
+                alert("Device control functionality not implemented yet.");
             });
         });
     </script>
 </body>
 </html>
-
