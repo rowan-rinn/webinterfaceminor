@@ -77,45 +77,68 @@
     </div>
 
     <!-- JavaScript -->
+     
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            // ThingSpeak API configuratie
-            const channelId = "2648650"; // Vervang door je kanaal ID
-            const readApiKey = "8KPBKJBRJMPH3WNR"; // Vervang door je lees API sleutel
-            
-            // Functie om gegevens van ThingSpeak op te halen
-            function getSensorData() {
-                fetch(`https://api.thingspeak.com/channels/${channelId}/fields/1/last.json?api_key=${readApiKey}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        document.getElementById("tempValue").textContent = data.field1; // Temperatuur
-                    })
-                    .catch(error => console.log("Error fetching temperature:", error));
-                
-                fetch(`https://api.thingspeak.com/channels/${channelId}/fields/2/last.json?api_key=${readApiKey}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        document.getElementById("humidityValue").textContent = data.field2; // Vochtigheid
-                    })
-                    .catch(error => console.log("Error fetching humidity:", error));
+    // ThingSpeak API configuratie
+    const channelId = "2648650"; // Vervang door je kanaal ID
+    const readApiKey = "8KPBKJBRJMPH3WNR"; // Vervang door je lees API sleutel
+    
+    // Functie om gegevens van ThingSpeak op te halen
+    function getSensorData() {
+        fetch(`https://api.thingspeak.com/channels/${channelId}/fields/1/last.json?api_key=${readApiKey}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("Temperature Data:", data); // Debug log
+                document.getElementById("tempValue").textContent = data.field1; // Temperatuur
+            })
+            .catch(error => console.error("Error fetching temperature:", error));
+        
+        fetch(`https://api.thingspeak.com/channels/${channelId}/fields/2/last.json?api_key=${readApiKey}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("Humidity Data:", data); // Debug log
+                document.getElementById("humidityValue").textContent = data.field2; // Vochtigheid
+            })
+            .catch(error => console.error("Error fetching humidity:", error));
 
-                fetch(`https://api.thingspeak.com/channels/${channelId}/fields/3/last.json?api_key=${readApiKey}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        document.getElementById("uvValue").textContent = data.field3; // UV Index
-                    })
-                    .catch(error => console.log("Error fetching UV index:", error));
-            }
+        fetch(`https://api.thingspeak.com/channels/${channelId}/fields/3/last.json?api_key=${readApiKey}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("UV Index Data:", data); // Debug log
+                document.getElementById("uvValue").textContent = data.field3; // UV Index
+            })
+            .catch(error => console.error("Error fetching UV index:", error));
+    }
 
-            // Fetch data every 5 seconds
-            setInterval(getSensorData, 5000);
+    // Fetch data every 5 seconds
+    setInterval(getSensorData, 5000);
 
-            // Control button event
-            document.getElementById("controlButton").addEventListener("click", function() {
-                // Voeg hier de functionaliteit toe voor het aan/uit zetten van een apparaat
-                alert("Device control functionality not implemented yet.");
-            });
-        });
+    // Initial data fetch
+    getSensorData();
+
+    // Control button event
+    document.getElementById("controlButton").addEventListener("click", function() {
+        // Voeg hier de functionaliteit toe voor het aan/uit zetten van een apparaat
+        alert("Device control functionality not implemented yet.");
+    });
+});
+
     </script>
 </body>
 </html>
