@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homestation Dashboard</title>
+    
+    <!-- CSS ingesloten binnen een <style> tag -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        section {
+            margin-bottom: 20px;
+        }
+
+        .sensor-data, .controls {
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+    </style>
+
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Homestation Dashboard</h1>
+        </header>
+
+        <section class="sensor-data">
+            <h2>Sensor Data</h2>
+            <p>Temperature: <span id="tempValue">--</span>°C</p>
+            <p>Humidity: <span id="humidityValue">--</span>%</p>
+            <p>UV Index: <span id="uvValue">--</span></p>
+        </section>
+
+        <section class="controls">
+            <h2>Controls</h2>
+            <button id="controlButton">Turn On/Off Device</button>
+        </section>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Simulate fetching data from ESP32
+            function getSensorData() {
+                fetch("http://your-esp32-ip/sensor-data")
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById("tempValue").textContent = data.temperature;
+                        document.getElementById("humidityValue").textContent = data.humidity;
+                        document.getElementById("uvValue").textContent = data.uvIndex;
+                    })
+                    .catch(error => console.log("Error fetching sensor data:", error));
+            }
+
+            // Fetch data every 5 seconds
+            setInterval(getSensorData, 5000);
+
+            // Control button event
+            document.getElementById("controlButton").addEventListener("click", function() {
+                fetch("http://your-esp32-ip/toggle-device", {
+                    method: "POST"
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                })
+                .catch(error => console.log("Error controlling device:", error));
+            });
+        });
+    </script>
+</body>
+</html>
+
