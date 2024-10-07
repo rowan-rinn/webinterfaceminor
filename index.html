@@ -85,21 +85,21 @@
             
             // Functie om gegevens van ThingSpeak op te halen
             function getSensorData() {
-                fetch(`http://api.thingspeak.com/channels/${channelId}/fields/1/last.json?api_key=${readApiKey}`)
+                fetch(`https://api.thingspeak.com/channels/${channelId}/fields/1/last.json?api_key=${readApiKey}`)
                     .then(response => response.json())
                     .then(data => {
                         document.getElementById("tempValue").textContent = data.field1; // Temperatuur
                     })
                     .catch(error => console.log("Error fetching temperature:", error));
                 
-                fetch(`http://api.thingspeak.com/channels/${channelId}/fields/2/last.json?api_key=${readApiKey}`)
+                fetch(`https://api.thingspeak.com/channels/${channelId}/fields/2/last.json?api_key=${readApiKey}`)
                     .then(response => response.json())
                     .then(data => {
                         document.getElementById("humidityValue").textContent = data.field2; // Vochtigheid
                     })
                     .catch(error => console.log("Error fetching humidity:", error));
 
-                fetch(`http://api.thingspeak.com/channels/${channelId}/fields/3/last.json?api_key=${readApiKey}`)
+                fetch(`https://api.thingspeak.com/channels/${channelId}/fields/3/last.json?api_key=${readApiKey}`)
                     .then(response => response.json())
                     .then(data => {
                         document.getElementById("uvValue").textContent = data.field3; // UV Index
