@@ -81,8 +81,8 @@
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             // MQTT broker informatie
-            const mqttBroker = "wss://145.24.223.91:8001"; // Gebruik je bestaande broker URL
-            const clientId = "mqtt_client_web_dashboard_Rowan";  // Willekeurige clientID
+            const mqttBroker = "ws://145.24.223.91:8001"; // Gebruik je bestaande broker URL
+            const clientId = "mqtt_client_web_dashboard_rowan" + Math.random().toString(16).substr(2, 8);;  // Willekeurige clientID
             const tempTopic = "Rowan/sensors/temperature"; // Gebruik je bestaande topics
             const humidityTopic = "Rowan/sensors/humidity";
             // const uvTopic = "Rowan/sensors/uv"; // Als je UV-sensor hebt
