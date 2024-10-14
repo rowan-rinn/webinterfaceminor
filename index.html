@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Homestation Dashboard</title>
     
-    <!-- CSS ingesloten binnen een <style> tag -->
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -76,75 +75,71 @@
         </section>
     </div>
 
-    <!-- JavaScript -->
-     
+    <!-- MQTT.js Bibliotheek -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
+
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-    // ThingSpeak API configuratie
-    const channelId = "2648650"; // Vervang door je kanaal ID
-    const readApiKey = "8KPBKJBRJMPH3WNR"; // Vervang door je lees API sleutel
-    
-    // Functie om gegevens van ThingSpeak op te halen
-    function getSensorData() {
-        fetch(`https://api.thingspeak.com/channels/${channelId}/fields/1/last.json?api_key=${readApiKey}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok ' + response.statusText);
+            // MQTT broker informatie
+            const mqttBroker = "ws://145.24.223.91:8001"; // Gebruik je bestaande broker URL
+            const clientId = "mqtt_client_web_dashboard_Rowan";  // Willekeurige clientID
+            const tempTopic = "Rowan/sensors/temperature"; // Gebruik je bestaande topics
+            const humidityTopic = "Rowan/sensors/humidity";
+            // const uvTopic = "Rowan/sensors/uv"; // Als je UV-sensor hebt
+
+            // Maak een MQTT-client
+            const client = new Paho.MQTT.Client(mqttBroker, clientId);
+
+            // Verbindingsopties
+            const options = {
+                timeout: 3,
+                onSuccess: onConnect,
+                onFailure: function (message) {
+                    console.log("Connection failed: " + message.errorMessage);
                 }
-                return response.json();
-            })
-            .then(data => {
-                console.log("Temperature Data:", data); // Debug log
-                document.getElementById("tempValue").textContent = data.field1; // Temperatuur
-            })
-            .catch(error => console.error("Error fetching temperature:", error));
-        
-        fetch(`https://api.thingspeak.com/channels/${channelId}/fields/2/last.json?api_key=${readApiKey}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok ' + response.statusText);
+            };
+
+            // Verbind met de broker
+            client.connect(options);
+
+            // MQTT callback bij bericht ontvangen
+            client.onMessageArrived = onMessageArrived;
+
+            // Functie die wordt aangeroepen als de client verbindt
+            function onConnect() {
+                console.log("Connected to MQTT broker");
+
+                // Abonneer je op de sensortopics
+                client.subscribe(tempTopic);
+                client.subscribe(humidityTopic);
+                client.subscribe(uvTopic);
+            }
+
+            // Functie die wordt aangeroepen wanneer een bericht wordt ontvangen
+            function onMessageArrived(message) {
+                console.log("Message received: " + message.payloadString + " on topic: " + message.destinationName);
+
+                // Update de juiste waarden in de interface
+                if (message.destinationName === tempTopic) {
+                    document.getElementById("tempValue").textContent = message.payloadString;
                 }
-                return response.json();
-            })
-            .then(data => {
-                console.log("Humidity Data:", data); // Debug log
-                document.getElementById("humidityValue").textContent = data.field2; // Vochtigheid
-            })
-            .catch(error => console.error("Error fetching humidity:", error));
-
-        // Verwijder het fetch-verzoek voor UV index
-        // Als je UV index niet nodig hebt, kun je deze sectie gewoon verwijderen
-        // Hier is het voor het geval je het later wilt toevoegen
-        /*
-        fetch(`https://api.thingspeak.com/channels/${channelId}/fields/3/last.json?api_key=${readApiKey}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok ' + response.statusText);
+                if (message.destinationName === humidityTopic) {
+                    document.getElementById("humidityValue").textContent = message.payloadString;
                 }
-                return response.json();
-            })
-            .then(data => {
-                console.log("UV Index Data:", data); // Debug log
-                document.getElementById("uvValue").textContent = data.field3 || "N/A"; // UV Index
-            })
-            .catch(error => console.error("Error fetching UV index:", error));
-        */
-    }
+                // if (message.destinationName === uvTopic) {
+                //     document.getElementById("uvValue").textContent = message.payloadString;
+                // }
+            }
 
-    // Fetch data every 5 seconds
-    setInterval(getSensorData, 5000);
-
-    // Initial data fetch
-    getSensorData();
-
-    // Control button event
-    document.getElementById("controlButton").addEventListener("click", function() {
-        // Voeg hier de functionaliteit toe voor het aan/uit zetten van een apparaat
-        alert("Device control functionality not implemented yet.");
-    });
-});
-
-
+            // Control button functionaliteit
+            // document.getElementById("controlButton").addEventListener("click", function() {
+            //     const controlTopic = "Rowan/control/device";  // Vervang met het juiste control topic
+            //     const message = new Paho.MQTT.Message("TOGGLE");
+            //     message.destinationName = controlTopic;
+            //     client.send(message);
+            //     alert("Device control command sent.");
+            // });
+        });
     </script>
 </body>
 </html>
