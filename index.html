@@ -1,145 +1,29 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="nl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Homestation Dashboard</title>
-    
+    <title>ESP32 Controller</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-
-        .container {
-            background: white;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            max-width: 400px;
-            width: 100%;
-        }
-
-        header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        section {
-            margin-bottom: 20px;
-        }
-
-        .sensor-data, .controls {
-            border: 1px solid #ddd;
-            padding: 15px;
-            border-radius: 5px;
-        }
-
-        button {
-            background-color: #28a745;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-
-        button:hover {
-            background-color: #218838;
-        }
+        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+        button { font-size: 20px; padding: 10px 20px; margin: 20px; cursor: pointer; }
     </style>
-
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Homestation Dashboard</h1>
-        </header>
-
-        <section class="sensor-data">
-            <h2>Sensor Data</h2>
-            <p>Temperature: <span id="tempValue">--</span>°C</p>
-            <p>Humidity: <span id="humidityValue">--</span>%</p>
-            <p>UV Index: <span id="uvValue">--</span></p>
-        </section>
-
-        <section class="controls">
-            <h2>Controls</h2>
-            <button id="controlButton">Turn On/Off Device</button>
-        </section>
-    </div>
-
-    <!-- MQTT.js Bibliotheek -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
+    <h1>ESP32 Controller</h1>
+    <button onclick="sendCommand('extend')">Uitschuiven</button>
+    <button onclick="sendCommand('retract')">Inschuiven</button>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // MQTT broker informatie
-            const mqttBroker = "wss://172.24.0.4:1884/mqtt"; // Gebruik je bestaande broker URL
-            const clientId = "mqtt_client_web_dashboard_rowan" + Math.random().toString(16).substr(2, 8);;  // Willekeurige clientID
-            const tempTopic = "Rowan/sensors/temperature"; // Gebruik je bestaande topics
-            const humidityTopic = "Rowan/sensors/humidity";
-            // const uvTopic = "Rowan/sensors/uv"; // Als je UV-sensor hebt
-
-            // Maak een MQTT-client
-            const client = new Paho.MQTT.Client(mqttBroker, clientId);
-
-            // Verbindingsopties
-            const options = {
-                timeout: 3,
-                onSuccess: onConnect,
-                onFailure: function (message) {
-                    console.log("Connection failed: " + message.errorMessage);
-                }
-            };
-
-            // Verbind met de broker
-            client.connect(options);
-
-            // MQTT callback bij bericht ontvangen
-            client.onMessageArrived = onMessageArrived;
-
-            // Functie die wordt aangeroepen als de client verbindt
-            function onConnect() {
-                console.log("Connected to MQTT broker");
-
-                // Abonneer je op de sensortopics
-                client.subscribe(tempTopic);
-                client.subscribe(humidityTopic);
-                client.subscribe(uvTopic);
-            }
-
-            // Functie die wordt aangeroepen wanneer een bericht wordt ontvangen
-            function onMessageArrived(message) {
-                console.log("Message received: " + message.payloadString + " on topic: " + message.destinationName);
-
-                // Update de juiste waarden in de interface
-                if (message.destinationName === tempTopic) {
-                    document.getElementById("tempValue").textContent = message.payloadString;
-                }
-                if (message.destinationName === humidityTopic) {
-                    document.getElementById("humidityValue").textContent = message.payloadString;
-                }
-                // if (message.destinationName === uvTopic) {
-                //     document.getElementById("uvValue").textContent = message.payloadString;
-                // }
-            }
-
-            // Control button functionaliteit
-            // document.getElementById("controlButton").addEventListener("click", function() {
-            //     const controlTopic = "Rowan/control/device";  // Vervang met het juiste control topic
-            //     const message = new Paho.MQTT.Message("TOGGLE");
-            //     message.destinationName = controlTopic;
-            //     client.send(message);
-            //     alert("Device control command sent.");
-            // });
-        });
+        function sendCommand(command) {
+            const espUrl = 'https://your-esp32-url.local/command'; // Vervang dit met je ESP32 URL
+            fetch(`${espUrl}?action=${command}`, {
+                method: 'GET',
+                mode: 'no-cors' // Omdat ESP32 geen certificaten ondersteunt
+            })
+            .then(response => console.log(`Command ${command} sent!`))
+            .catch(error => console.error('Error:', error));
+        }
     </script>
 </body>
 </html>
